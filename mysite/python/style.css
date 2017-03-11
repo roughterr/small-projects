@@ -1,0 +1,69 @@
+body {
+background-color: gray;
+}
+
+.header, .userbar, .osn {
+border-style: solid;
+position:relative;
+background-color: black;
+padding: 8px;
+}
+
+.header {
+border-color: blue;
+text-align: center; /* вирівнювання тексту */
+color: white;
+width:770px; /* ширина елементу */
+left: 100px;
+}
+
+.userbar {
+border-color: yellow; /* колір рамки */
+top: 8px; /* відстань від елемента "header" */
+text-align: center;
+color: lime;
+width:870px; /* ширина елементу */
+left: 50px;
+}
+
+.osn {
+border-color: green;
+top: 16px; /* відстань від елемента "userbar" */
+text-align: left;
+color: white;
+width:970px; /* ширина елементу */
+left: 10px;
+}
+
+.code {
+color: lime;
+background: black;
+white-space: pre-wrap;
+font-family:"Arial";
+}
+
+h3 {
+text-align: center;
+}
+
+.sidebar {
+position:absolute;
+left:1000px;
+width:150px;
+border-style: solid;
+border-color: purple;
+background-color: black;
+text-align: center; /* вирівнювання тексту */
+height:inherit;
+top:0px;
+white-space:pre-wrap;
+}
+
+.comment {
+color: gray
+}
+
+.lapky {
+color: #00FFFF;
+background: black;
+}
