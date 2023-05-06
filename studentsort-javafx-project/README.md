@@ -1,0 +1,2 @@
+## Application for sorting students by their performance
+To start the application, launch the UI from StudentSortApplication.java class. In the window that opened, select the file, sorting algorithm and click on the button "Sort" which will trigger sorting and suggest saving a file with the sorted results
