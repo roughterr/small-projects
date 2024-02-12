@@ -1,4 +1,4 @@
-package com.roughterr;
+package com.roughterr.players;
 
 /**
  * Represents a player who can send messages to other players.
@@ -55,6 +55,7 @@ public class Player {
     public synchronized void sendMessage(String messageContent, Player receiver) {
         if (sentMessagesLimit > -1 && sentMessagesCount >= sentMessagesLimit) {
             System.out.println("Player \"" + name + "\" has reached the limit of sent messages");
+            messageManager.finalizeGracefully();
         } else {
             sentMessagesCount++;
             messageManager.sendMessage(new Message(this, receiver, messageContent));
@@ -67,9 +68,10 @@ public class Player {
      * @param messageContent the message content
      * @param sender         who sent the message
      */
-    public synchronized void onMessage(String messageContent, Player sender) {
+    public synchronized void receiveMessage(String messageContent, Player sender) {
         if (receivedMessagesLimit > -1 && receivedMessagesCount >= receivedMessagesLimit) {
             System.out.println("Player \"" + name + "\" has has reached the limit of received messages");
+            messageManager.finalizeGracefully();
             return;
         } else {
             receivedMessagesCount++;

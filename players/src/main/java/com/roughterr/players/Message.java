@@ -1,4 +1,4 @@
-package com.roughterr;
+package com.roughterr.players;
 
 /**
  * Represents a message.

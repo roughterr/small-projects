@@ -1,4 +1,4 @@
-package com.roughterr;
+package com.roughterr.players;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -14,9 +14,13 @@ public class MessageManagerSingleThread implements MessageManager {
         messageQueue.add(message);
         while (!messageQueue.isEmpty()) {
             Message pollMessage = messageQueue.poll();
-            //pollMessage.getSender().sendMessage(pollMessage.getMessageContent(), pollMessage.getReceiver());
-            pollMessage.getReceiver().onMessage(pollMessage.getMessageContent(), pollMessage.getSender());
+            pollMessage.getReceiver().receiveMessage(pollMessage.getMessageContent(), pollMessage.getSender());
             messageQueue.remove(pollMessage);
         }
+    }
+
+    @Override
+    public void finalizeGracefully() {
+        System.out.println("MessageManagerSingleThread.finalizeGracefully() called");
     }
 }
