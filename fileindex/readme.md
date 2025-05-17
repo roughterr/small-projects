@@ -1,0 +1,1 @@
+Cette application prend en compte un fichier texte et génère un index qui répertorie tous les différents mots de plus de 5 caractères contenus dans le texte par ordre alphabétique suivi de chaque numéro de ligne où se trouve le mot.

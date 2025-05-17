@@ -1,0 +1,6 @@
+Danser 2 6
+Envoyer 1 5
+Impala 3 7
+Kiffer 4 8
+Monter 3 7
+balader 1 5
