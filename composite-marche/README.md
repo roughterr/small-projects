@@ -1,0 +1,1 @@
+This project demonstrates the use of the Composite design pattern in Java.
