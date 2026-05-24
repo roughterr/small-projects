@@ -27,7 +27,7 @@ public class MarcheCompositeMeilleur implements Marche {
             if (prixAchatMinimum == 0d) {
                 throw new IllegalStateException();
             }
-            if (marcheAvecPrixAchatMinimum != null) {
+            if (marcheAvecPrixAchatMinimum != null && (ordre.prixLimite() == null || ordre.prixLimite() >= prixAchatMinimum)){
                 return marcheAvecPrixAchatMinimum.executerOrdre(ordre);
             }
         } else if (ordre.sens() == Sens.VENTE) {
@@ -43,7 +43,10 @@ public class MarcheCompositeMeilleur implements Marche {
             if (prixVenteMaximum == 0d) {
                 throw new IllegalStateException();
             }
-            return marcheAvecPrixVenteMaximum.executerOrdre(ordre);
+            // Vérifiez que les limites ne sont pas dépassées
+            if (ordre.prixLimite() == null || ordre.prixLimite() <= prixVenteMaximum) {
+                return marcheAvecPrixVenteMaximum.executerOrdre(ordre);
+            }
         }
         return null;
     }

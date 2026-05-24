@@ -10,5 +10,5 @@ package com.roughterr;
  * @param sens                   ACHAT ou VENTE indiquant si nous voulons acheter ou vendre le ticker
  * @param nombreActions          nombre d'actions que nous voulons acheter ou vendre
  */
-public record Ordre(String identifiantOrdreClient, String ticker, Sens sens, int nombreActions) {
+public record Ordre(String identifiantOrdreClient, String ticker, Sens sens, int nombreActions, Double prixLimite) {
 }
