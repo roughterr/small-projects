@@ -12,6 +12,7 @@ import static org.mockito.Mockito.*;
 class MarcheCompositeMeilleurTest {
     private static final String RGTI_TICKER = "RGTI";
     private static final Ordre RGTI_ORDRE_1 = new Ordre("1", "RGTI", Sens.ACHAT, 5);
+    private static final Ordre RGTI_VENTE_ORDRE_1 = new Ordre("1", "RGTI", Sens.VENTE, 5);
 
     @Test
     public void shouldThrowExceptionWhenprovidedListIsEmpty() {
@@ -37,9 +38,9 @@ class MarcheCompositeMeilleurTest {
         when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d));
         when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
-        marcheCompositeMeilleur.executerOrdre(RGTI_ORDRE_1);
+        marcheCompositeMeilleur.executerOrdre(RGTI_VENTE_ORDRE_1);
         verify(m1, never()).executerOrdre(any());
-        verify(m2, times(1)).executerOrdre(RGTI_ORDRE_1);
+        verify(m2, times(1)).executerOrdre(RGTI_VENTE_ORDRE_1);
     }
 
     @Test
@@ -50,7 +51,7 @@ class MarcheCompositeMeilleurTest {
         when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(0d, 32.04d));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
         assertThrows(IllegalStateException.class, () -> {
-            marcheCompositeMeilleur.executerOrdre(RGTI_ORDRE_1);
+            marcheCompositeMeilleur.executerOrdre(RGTI_VENTE_ORDRE_1);
         });
     }
 

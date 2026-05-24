@@ -14,12 +14,54 @@ public class MarcheCompositeMeilleur implements Marche {
 
     @Override
     public RapportExecution executerOrdre(Ordre ordre) {
+        if (ordre.sens() == Sens.ACHAT) {
+            double prixAchatMinimum = Double.MAX_VALUE;
+            Marche marcheAvecPrixAchatMinimum = null;
+            for (Marche marche : marches) {
+                PrixActuelsDuMarche prixActuelsDuMarche = marche.prixDuMarche(ordre.ticker());
+                if (prixActuelsDuMarche.achetableAUnPrix() < prixAchatMinimum) {
+                    prixAchatMinimum = prixActuelsDuMarche.achetableAUnPrix();
+                    marcheAvecPrixAchatMinimum = marche;
+                }
+            }
+            if (prixAchatMinimum == 0d) {
+                throw new IllegalStateException();
+            }
+            if (marcheAvecPrixAchatMinimum != null) {
+                return marcheAvecPrixAchatMinimum.executerOrdre(ordre);
+            }
+        } else if (ordre.sens() == Sens.VENTE) {
+            double prixVenteMaximum = 0d;
+            Marche marcheAvecPrixVenteMaximum = null;
+            for (Marche marche : marches) {
+                PrixActuelsDuMarche prixActuelsDuMarche = marche.prixDuMarche(ordre.ticker());
+                if (prixActuelsDuMarche.vendableAUnPrix() > prixVenteMaximum) {
+                    prixVenteMaximum = prixActuelsDuMarche.vendableAUnPrix();
+                    marcheAvecPrixVenteMaximum = marche;
+                }
+            }
+            if (prixVenteMaximum == 0d) {
+                throw new IllegalStateException();
+            }
+            return marcheAvecPrixVenteMaximum.executerOrdre(ordre);
+        }
         return null;
     }
 
     @Override
     public PrixActuelsDuMarche prixDuMarche(String ticker) {
-        return null;
+        double prixAchatMinimum = Double.MAX_VALUE;
+        double prixVenteMaximum = 0d;
+        for (Marche marche : marches) {
+            PrixActuelsDuMarche prixActuelsDuMarche = marche.prixDuMarche(ticker);
+            if (prixActuelsDuMarche.achetableAUnPrix() < prixAchatMinimum) {
+                prixAchatMinimum = prixActuelsDuMarche.achetableAUnPrix();
+            }
+            if (prixActuelsDuMarche.vendableAUnPrix() > prixVenteMaximum) {
+                prixVenteMaximum = prixActuelsDuMarche.vendableAUnPrix();
+            }
+        }
+        return new PrixActuelsDuMarche(prixVenteMaximum, prixAchatMinimum);
     }
 
     @Override
