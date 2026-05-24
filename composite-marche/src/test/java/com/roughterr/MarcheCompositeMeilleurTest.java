@@ -23,8 +23,8 @@ class MarcheCompositeMeilleurTest {
     public void shouldBuyCheaper() {
         Marche m1 = Mockito.mock(Marche.class);
         Marche m2 = Mockito.mock(Marche.class);
-        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d));
-        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d));
+        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d, 12));
+        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d, 5));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
         marcheCompositeMeilleur.executerOrdre(RGTI_ORDRE_1);
         verify(m1, times(1)).executerOrdre(RGTI_ORDRE_1);
@@ -35,8 +35,8 @@ class MarcheCompositeMeilleurTest {
     public void shouldSellMoreExpensive() {
         Marche m1 = Mockito.mock(Marche.class);
         Marche m2 = Mockito.mock(Marche.class);
-        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d));
-        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d));
+        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d, 12));
+        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d, 17));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
         marcheCompositeMeilleur.executerOrdre(RGTI_VENTE_ORDRE_1);
         verify(m1, never()).executerOrdre(any());
@@ -47,8 +47,8 @@ class MarcheCompositeMeilleurTest {
     public void shouldThrowExceptionWhenSellPriceZero() {
         Marche m1 = Mockito.mock(Marche.class);
         Marche m2 = Mockito.mock(Marche.class);
-        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(0d, 30.7d));
-        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(0d, 32.04d));
+        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(0d, 30.7d, 12));
+        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(0d, 32.04d, 17));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
         assertThrows(IllegalStateException.class, () -> {
             marcheCompositeMeilleur.executerOrdre(RGTI_VENTE_ORDRE_1);
@@ -59,8 +59,8 @@ class MarcheCompositeMeilleurTest {
     public void shouldThrowExceptionWhenBuyPriceZero() {
         Marche m1 = Mockito.mock(Marche.class);
         Marche m2 = Mockito.mock(Marche.class);
-        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 0d));
-        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 0d));
+        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 0d, 1));
+        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 0d, 1));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
         assertThrows(IllegalStateException.class, () -> {
             marcheCompositeMeilleur.executerOrdre(RGTI_ORDRE_1);
@@ -72,13 +72,15 @@ class MarcheCompositeMeilleurTest {
         Marche m1 = Mockito.mock(Marche.class);
         Marche m2 = Mockito.mock(Marche.class);
         Marche m3 = Mockito.mock(Marche.class);
-        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d));
-        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d));
-        when(m3.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.2d, 30.03d));
+        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d, 12));
+        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d, 10));
+        when(m3.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.2d, 30.03d, 8));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2, m3));
         PrixActuelsDuMarche prixActuelsDuMarche = marcheCompositeMeilleur.prixDuMarche(RGTI_TICKER);
         assertEquals(30.03d, prixActuelsDuMarche.achetableAUnPrix(), 0.0001);
         assertEquals(30.2d, prixActuelsDuMarche.vendableAUnPrix(), 0.0001);
+        // compter aussi la quantité totale
+        assertEquals(30, prixActuelsDuMarche.quantiteDisponible());
     }
 
     @Test
@@ -102,8 +104,8 @@ class MarcheCompositeMeilleurTest {
     public void shouldBuyCheaperWithLimits() {
         Marche m1 = Mockito.mock(Marche.class);
         Marche m2 = Mockito.mock(Marche.class);
-        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d));
-        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d));
+        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d, 1));
+        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d, 1));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
         Ordre ordreAchatAvecLimite = new Ordre("1", "RGTI", Sens.ACHAT, 5, 35d);
         marcheCompositeMeilleur.executerOrdre(ordreAchatAvecLimite);
@@ -115,8 +117,8 @@ class MarcheCompositeMeilleurTest {
     public void shouldNotBuyWhenPriceIsHigherThanBuyLimit() {
         Marche m1 = Mockito.mock(Marche.class);
         Marche m2 = Mockito.mock(Marche.class);
-        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d));
-        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d));
+        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d,1));
+        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d, 1));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
         Ordre ordreAchatAvecLimite = new Ordre("1", "RGTI", Sens.ACHAT, 5, 20d);
         marcheCompositeMeilleur.executerOrdre(ordreAchatAvecLimite);
@@ -128,8 +130,8 @@ class MarcheCompositeMeilleurTest {
     public void shouldNotSellWhenPriceIsHigherThanBuyLimit() {
         Marche m1 = Mockito.mock(Marche.class);
         Marche m2 = Mockito.mock(Marche.class);
-        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d));
-        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d));
+        when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d, 1));
+        when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d, 1));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
         Ordre ordreVenteAvecLimite = new Ordre("1", "RGTI", Sens.VENTE, 5, 40d);
         marcheCompositeMeilleur.executerOrdre(ordreVenteAvecLimite);

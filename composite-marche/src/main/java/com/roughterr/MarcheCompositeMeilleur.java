@@ -1,9 +1,12 @@
 package com.roughterr;
 
+import com.roughterr.cache.MarcheCompositeCache;
+
 import java.util.List;
 
 public class MarcheCompositeMeilleur implements Marche {
     private List<Marche> marches;
+    private MarcheCompositeCache cache;
 
     public MarcheCompositeMeilleur(List<Marche> marches) {
         if (marches == null || marches.isEmpty()) {
@@ -55,6 +58,7 @@ public class MarcheCompositeMeilleur implements Marche {
     public PrixActuelsDuMarche prixDuMarche(String ticker) {
         double prixAchatMinimum = Double.MAX_VALUE;
         double prixVenteMaximum = 0d;
+        int quantiteDisponible = 0;
         for (Marche marche : marches) {
             PrixActuelsDuMarche prixActuelsDuMarche = marche.prixDuMarche(ticker);
             if (prixActuelsDuMarche.achetableAUnPrix() < prixAchatMinimum) {
@@ -63,8 +67,9 @@ public class MarcheCompositeMeilleur implements Marche {
             if (prixActuelsDuMarche.vendableAUnPrix() > prixVenteMaximum) {
                 prixVenteMaximum = prixActuelsDuMarche.vendableAUnPrix();
             }
+            quantiteDisponible += prixActuelsDuMarche.quantiteDisponible();
         }
-        return new PrixActuelsDuMarche(prixVenteMaximum, prixAchatMinimum);
+        return new PrixActuelsDuMarche(prixVenteMaximum, prixAchatMinimum, quantiteDisponible);
     }
 
     @Override
