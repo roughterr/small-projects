@@ -86,26 +86,26 @@ Si l'exécution échoue sur le meilleur marché sélectionné, le système doit 
 
 ---
 
-### Fonctionnalité 4 : Mise en cache des prix de marché
+### Fonctionnalité 4 : Absence de mise en cache des prix de marché
 
 #### Description
 
-La récupération des prix de marché doit être optimisée à l'aide d'un mécanisme de cache basé sur le temps.
+Les prix de marché ne doivent jamais être mis en cache afin d'éviter l'utilisation de données obsolètes lors du routage ou de l'exécution des ordres.
 
 #### Exigences
 
-* Mettre en cache les résultats de `prixDuMarche(ticker)`
-* TTL : 500 millisecondes
+* Chaque appel à `prixDuMarche(ticker)` doit interroger directement le marché concerné
+* Aucun cache mémoire, cache distribué ou mécanisme TTL n'est autorisé
+* Les résultats ne doivent pas être réutilisés entre deux appels indépendants
 
 #### Comportement
 
-* Retourner la valeur en cache si elle est encore valide
-* Rafraîchir le cache lorsqu'il est expiré
+* Toujours récupérer la valeur la plus récente disponible
+* Favoriser la fraîcheur des données plutôt que l'optimisation des performances
 
 #### Méthodes concernées
 
 * `prixDuMarche(String ticker)`
-* Couche de cache interne
 
 ---
 
