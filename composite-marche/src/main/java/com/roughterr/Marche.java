@@ -1,5 +1,7 @@
 package com.roughterr;
 
+import java.util.Optional;
+
 public interface Marche {
     /**
      * Envoie un ordre à un marché pour exécution.

@@ -1,7 +1,6 @@
 package com.roughterr;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -11,8 +10,10 @@ import static org.mockito.Mockito.*;
 
 class MarcheCompositeMeilleurTest {
     private static final String RGTI_TICKER = "RGTI";
-    private static final Ordre RGTI_ORDRE_1 = new Ordre("1", "RGTI", Sens.ACHAT, 5, null);
-    private static final Ordre RGTI_VENTE_ORDRE_1 = new Ordre("1", "RGTI", Sens.VENTE, 5, null);
+    private static final String IDENTIFIANT_ORDRE_CLIENT_1 = "1";
+    private static final Ordre RGTI_ORDRE_1 = new Ordre(IDENTIFIANT_ORDRE_CLIENT_1, RGTI_TICKER, Sens.ACHAT, 5, null);
+    private static final Ordre RGTI_VENTE_ORDRE_1 = new Ordre(IDENTIFIANT_ORDRE_CLIENT_1, RGTI_TICKER, Sens.VENTE, 5, null);
+
 
     @Test
     public void shouldThrowExceptionWhenprovidedListIsEmpty() {
@@ -89,15 +90,15 @@ class MarcheCompositeMeilleurTest {
         Marche m2 = Mockito.mock(Marche.class);
         Marche m3 = Mockito.mock(Marche.class);
         RapportExecution mockRaportExecution1 = new RapportExecution("2", RGTI_TICKER, Sens.ACHAT, 5, 12d);
-        RapportExecution mockRaportExecution2 = new RapportExecution("1", RGTI_TICKER, Sens.ACHAT, 6, 12d);
-        RapportExecution mockRaportExecution3 = new RapportExecution("1", RGTI_TICKER, Sens.ACHAT, 4, 10d);
+        RapportExecution mockRaportExecution2 = new RapportExecution(IDENTIFIANT_ORDRE_CLIENT_1, RGTI_TICKER, Sens.ACHAT, 6, 12d);
+        RapportExecution mockRaportExecution3 = new RapportExecution(IDENTIFIANT_ORDRE_CLIENT_1, RGTI_TICKER, Sens.ACHAT, 4, 10d);
         // Nous retournons un RapportExecution avec un identifiant incorrect volontairement -
         // nous voulons vérifier que notre marché composite détectera une erreur et le rejetterait.
-        when(m1.recupererStatutOrdre("1")).thenReturn(mockRaportExecution1);
-        when(m2.recupererStatutOrdre("1")).thenReturn(mockRaportExecution2);
-        when(m3.recupererStatutOrdre("1")).thenReturn(mockRaportExecution3);
+        when(m1.recupererStatutOrdre(IDENTIFIANT_ORDRE_CLIENT_1)).thenReturn(mockRaportExecution1);
+        when(m2.recupererStatutOrdre(IDENTIFIANT_ORDRE_CLIENT_1)).thenReturn(mockRaportExecution2);
+        when(m3.recupererStatutOrdre(IDENTIFIANT_ORDRE_CLIENT_1)).thenReturn(mockRaportExecution3);
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2, m3));
-        assertEquals(mockRaportExecution2, marcheCompositeMeilleur.recupererStatutOrdre("1"));
+        assertEquals(mockRaportExecution2, marcheCompositeMeilleur.recupererStatutOrdre(IDENTIFIANT_ORDRE_CLIENT_1));
     }
 
     @Test
@@ -107,7 +108,7 @@ class MarcheCompositeMeilleurTest {
         when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d, 1));
         when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d, 1));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
-        Ordre ordreAchatAvecLimite = new Ordre("1", "RGTI", Sens.ACHAT, 5, 35d);
+        Ordre ordreAchatAvecLimite = new Ordre(IDENTIFIANT_ORDRE_CLIENT_1, RGTI_TICKER, Sens.ACHAT, 5, 35d);
         marcheCompositeMeilleur.executerOrdre(ordreAchatAvecLimite);
         verify(m1, times(1)).executerOrdre(ordreAchatAvecLimite);
         verify(m2, never()).executerOrdre(any());
@@ -120,7 +121,7 @@ class MarcheCompositeMeilleurTest {
         when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d,1));
         when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d, 1));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
-        Ordre ordreAchatAvecLimite = new Ordre("1", "RGTI", Sens.ACHAT, 5, 20d);
+        Ordre ordreAchatAvecLimite = new Ordre(IDENTIFIANT_ORDRE_CLIENT_1, RGTI_TICKER, Sens.ACHAT, 5, 20d);
         marcheCompositeMeilleur.executerOrdre(ordreAchatAvecLimite);
         verify(m1, never()).executerOrdre(any());
         verify(m2, never()).executerOrdre(any());
@@ -133,9 +134,26 @@ class MarcheCompositeMeilleurTest {
         when(m1.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(29.25d, 30.7d, 1));
         when(m2.prixDuMarche(RGTI_TICKER)).thenReturn(new PrixActuelsDuMarche(30.1d, 32.04d, 1));
         Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
-        Ordre ordreVenteAvecLimite = new Ordre("1", "RGTI", Sens.VENTE, 5, 40d);
+        Ordre ordreVenteAvecLimite = new Ordre(IDENTIFIANT_ORDRE_CLIENT_1, RGTI_TICKER, Sens.VENTE, 5, 40d);
         marcheCompositeMeilleur.executerOrdre(ordreVenteAvecLimite);
         verify(m1, never()).executerOrdre(any());
         verify(m2, never()).executerOrdre(any());
+    }
+
+    /**
+     * Tests que la méthode OnRecupererStatutOrdre utilise bien la HashMap des marchés mise en cache.
+     */
+    @Test
+    public void testCacheOnRecupererStatutOrdre() {
+        Marche m1 = Mockito.mock(Marche.class);
+        Marche m2 = Mockito.mock(Marche.class);
+        when(m2.recupererStatutOrdre(IDENTIFIANT_ORDRE_CLIENT_1)).thenReturn(new RapportExecution(IDENTIFIANT_ORDRE_CLIENT_1, RGTI_TICKER, Sens.ACHAT, 5, 35d));
+        Marche marcheCompositeMeilleur = new MarcheCompositeMeilleur(List.of(m1, m2));
+        marcheCompositeMeilleur.recupererStatutOrdre(IDENTIFIANT_ORDRE_CLIENT_1);
+        verify(m1, times(1)).recupererStatutOrdre(anyString());
+        verify(m2, times(1)).recupererStatutOrdre(anyString());
+        marcheCompositeMeilleur.recupererStatutOrdre(IDENTIFIANT_ORDRE_CLIENT_1);
+        verify(m1, times(1)).recupererStatutOrdre(anyString());
+        verify(m2, times(2)).recupererStatutOrdre(anyString());
     }
 }

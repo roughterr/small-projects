@@ -1,12 +1,12 @@
 package com.roughterr;
 
-import com.roughterr.cache.MarcheCompositeCache;
-
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MarcheCompositeMeilleur implements Marche {
     private List<Marche> marches;
-    private MarcheCompositeCache cache;
+    private Map<String, Marche> identifiantOrdreClientToMarket = new HashMap<>();
 
     public MarcheCompositeMeilleur(List<Marche> marches) {
         if (marches == null || marches.isEmpty()) {
@@ -30,7 +30,7 @@ public class MarcheCompositeMeilleur implements Marche {
             if (prixAchatMinimum == 0d) {
                 throw new IllegalStateException();
             }
-            if (marcheAvecPrixAchatMinimum != null && (ordre.prixLimite() == null || ordre.prixLimite() >= prixAchatMinimum)){
+            if (marcheAvecPrixAchatMinimum != null && (ordre.prixLimite() == null || ordre.prixLimite() >= prixAchatMinimum)) {
                 return marcheAvecPrixAchatMinimum.executerOrdre(ordre);
             }
         } else if (ordre.sens() == Sens.VENTE) {
@@ -74,12 +74,18 @@ public class MarcheCompositeMeilleur implements Marche {
 
     @Override
     public RapportExecution recupererStatutOrdre(String identifiantOrdreClient) {
-        for (Marche marche : marches) {
-            RapportExecution rapportExecution = marche.recupererStatutOrdre(identifiantOrdreClient);
-            if (rapportExecution != null && identifiantOrdreClient.equals(rapportExecution.identifiantOrdreClient())) {
-                return rapportExecution;
+        Marche marcheMisEnCache = identifiantOrdreClientToMarket.get(identifiantOrdreClient);
+        if (marcheMisEnCache == null) {
+            for (Marche marche : marches) {
+                RapportExecution rapportExecution = marche.recupererStatutOrdre(identifiantOrdreClient);
+                if (rapportExecution != null && identifiantOrdreClient.equals(rapportExecution.identifiantOrdreClient())) {
+                    identifiantOrdreClientToMarket.put(identifiantOrdreClient, marche);
+                    return rapportExecution;
+                }
             }
+            return null;
+        } else {
+            return marcheMisEnCache.recupererStatutOrdre(identifiantOrdreClient);
         }
-        return null;
     }
 }
